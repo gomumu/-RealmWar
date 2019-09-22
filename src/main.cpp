@@ -1,12 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <time.h>
 
-//#include "config.h"
 #include "InputHandler.h"
 #include "Map.h"
 #include "Enemy.h"
 #include "Ship.h"
-
 using namespace sf;
 
 const int map_y = 200;
@@ -39,7 +37,8 @@ int main()
     map.ship.push_back(zet_ship);
 
     srand(time(0));
-	RenderWindow window(VideoMode(map.getMapHorizontalSize(), map.getMapverticalSize()), "");
+    std::pair<size_t, size_t> size =  map.getMapSize();
+	RenderWindow window(VideoMode(size.first, size.second), "");
 	window.setFramerateLimit(60);
 
 	//Texture t1,t2,t3;

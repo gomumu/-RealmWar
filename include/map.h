@@ -15,22 +15,26 @@ class Map {
 public:
     Map(int max_x, int max_y);
     ~Map();
+
+    void init();
+
     int getMax_x() {
         return max_x;
     }
     int getMax_y() {
         return max_y;
     }
-    std::vector<Tile*> getCoordinate() {
-        return coordinate;
+    std::vector<Tile*> getCoordinateMap() {
+        return coordinate_Map_;
     }
+
+    std::pair<size_t, size_t> Map::getCoordinate(size_t idx, size_t tile_width, size_t tile_height);
+
     bool updateMap();
 
     Tile* getTile(int x, int y);
 
-    int getMapHorizontalSize();
-
-    int getMapverticalSize();
+    std::pair<size_t, size_t> getMapSize();
 
     void drawMap(sf::RenderWindow* window);
 
@@ -41,6 +45,6 @@ public:
 private:
     int max_x;
     int max_y;
-    std::vector<Tile*> coordinate;
+    std::vector<Tile*> coordinate_Map_;
 };
 #endif

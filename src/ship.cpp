@@ -6,14 +6,14 @@
 using namespace sf;
 
 Ship::Ship() {
-    trace.push_back(new position(0, 0));
-    current_pos = trace.back();
-    v = 1;
-    sf::Texture* texture = new sf::Texture();
-    texture->loadFromFile("E:/study/1/xonix/images/spaceship2.png");
+    //trace.push_back(new position(0, 0));
+    //current_pos = trace.back();
+    //v = 1;
+    //sf::Texture* texture = new sf::Texture();
+    //texture->loadFromFile("E:/study/1/xonix/images/spaceship2.png");
 
-    ship_ = new sf::Sprite(*texture);
-    undo_ = false;
+    //ship_ = new sf::Sprite(*texture);
+    //undo_ = false;
 }
 
 void Ship::up() {
@@ -83,6 +83,6 @@ BattleShip::BattleShip() {
 }
 
 void Ship::drawShip(sf::RenderWindow* window, int tile_size) {
-    ship_->setPosition(current_pos->first*tile_size, current_pos->second*tile_size);
-    window->draw(*ship_);
+    //ship_->setPosition(current_pos->first*tile_size, current_pos->second*tile_size);
+    //window->draw(*ship_);
 }
