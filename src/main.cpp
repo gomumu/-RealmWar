@@ -4,11 +4,11 @@
 #include "InputHandler.h"
 #include "Map.h"
 #include "Enemy.h"
-#include "Ship.h"
+#include "frame.h"
 using namespace sf;
 
-const int map_y = 200;
-const int map_x = 400;
+const int map_y = 30;
+const int map_x = 50;
 
 //int grid[M][N] = {0};
 //
@@ -29,12 +29,13 @@ int main()
     Enemy* enemy2 = new Enemy(map_x, map_y);
     Enemy* enemy3 = new Enemy(map_x, map_y);
     Enemy* enemy4 = new Enemy(map_x, map_y);
-    ZetShip* zet_ship = new ZetShip();
+    Frame* frame = Frame::createFrame(BLUE_FRAME);
+
     map.enemy.push_back(enemy1);
     map.enemy.push_back(enemy2);
     map.enemy.push_back(enemy3);
     map.enemy.push_back(enemy4);
-    map.ship.push_back(zet_ship);
+    map.frame.push_back(frame);
 
     srand(time(0));
     std::pair<size_t, size_t> size =  map.getMapSize();
@@ -85,7 +86,7 @@ int main()
         
         if (timer > delay)
         {
-            handler.handleInput(zet_ship);
+            handler.handleInput(frame);
             Game = map.updateMap();
             timer = 0;
 

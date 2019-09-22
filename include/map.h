@@ -3,7 +3,7 @@
 
 #include <vector>
 
-class Ship;
+class Frame;
 class Enemy;
 class Tile;
 
@@ -40,7 +40,7 @@ public:
 
 
 
-    std::vector<Ship*> ship;
+    std::vector<Frame*> frame;
     std::vector<Enemy*> enemy;
 private:
     int max_x;

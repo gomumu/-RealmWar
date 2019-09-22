@@ -1,32 +1,32 @@
 #ifndef _Input_Handler_
 #define _Input_Handler_
 
-#include "ship.h"
+#include "frame.h"
 
 class Command {
 public:
     virtual ~Command() {}
-    virtual void execute(Ship* ship) = 0;
+    virtual void execute(Frame* frame) = 0;
 };
 
 class UpCommand : public Command {
 public:
-    virtual void execute(Ship* ship);
+    virtual void execute(Frame* frame);
 };
 
 class DownCommand : public Command {
 public:
-    virtual void execute(Ship* ship);
+    virtual void execute(Frame* frame);
 };
 
 class LeftCommand : public Command {
 public:
-    virtual void execute(Ship* ship);
+    virtual void execute(Frame* frame);
 };
 
 class RightCommand : public Command {
 public:
-    virtual void execute(Ship* ship);
+    virtual void execute(Frame* frame);
 };
 
 class InputHandler {
@@ -43,7 +43,7 @@ public:
         delete button_left_;
         delete button_right_;
     }
-    void handleInput(Ship* obj);
+    void handleInput(Frame* obj);
 
 private:
 

@@ -1,6 +1,6 @@
 #include "map.h"
 #include "Tile.h"
-#include "ship.h"
+#include "frame.h"
 #include "enemy.h"
 #include <SFML/Graphics.hpp>
 
@@ -16,9 +16,11 @@ Map::~Map() {
 void Map::init() {
     for (int i = 0; i < max_y; ++i) {
         for (int j = 0; j < max_x; ++j) {
-            Tile* t = Tile::createTile(WHITE_STATE);
+            Tile* t = nullptr;
             if (i == 0 || j == 0 || j == max_x - 1 || i == max_y - 1) {
-                t->setState(GREY_STATE);
+                t = Tile::createTile(GREY_STATE);
+            } else{
+                t = Tile::createTile(WHITE_STATE);
             }
             coordinate_Map_.push_back(t);
         }
@@ -49,76 +51,79 @@ std::pair<size_t, size_t> Map::getCoordinate(size_t idx, size_t tile_width, size
 }
 
 bool Map::updateMap() {
-    // ¹Ì±¸Çö
-    //for (auto s : ship) {
-    //    std::vector<position*> trace = s->getTrace();
 
-    //    position* current_pos = s->getCurrentPos();
-    //    int x = current_pos->first;
-    //    int y = current_pos->second;
-    //    while (x < 0 || y < 0 || x > max_x || y > max_y) {
-    //        if (!s->undo()) return true;
-    //        current_pos = s->getCurrentPos();
-    //        x = current_pos->first;
-    //        y = current_pos->second;
-    //    }
-    //    if (s->undo_) {
-    //        if (s->undo()) {
-    //            getTile(x, y)->setState(BLACK_STATE);
-    //            return true;
-    //        } else {
-    //            s->undo_ = false;
-    //            return true;
-    //        }
-    //    }
-    //    for (auto position = trace.rbegin(); position != trace.rend(); ++position) {
-    //        current_pos = s->getCurrentPos();
-    //        int pointer_x = x, pointer_y = y;
-    //        Tile* tile = getTile(pointer_x, pointer_y);
-    //        STATE state = tile->getState();
-    //        switch (state) {
-    //            case BLACK_STATE:{
-    //                getTile(x,y)->setState(BLUE_STATE);
-    //                break;
-    //            }
-    //            case BLUE_STATE: {
-    //                //ground!
-    //                for (auto begin : trace) {
+    for (auto f : frame) {
+        f;
+        std::list<position*> tmp = f->getTmp();
+        position* p = f->getCurrentPos();
+        bool realming = !tmp.empty();
+        int x = p->first;
+        int y = p->second;
+        while (x < 0 || y < 0 || x > max_x || y > max_y) {
+            break;
+        }
 
-    //                }
-    //                if (trace.size() > 1) {
-    //                    current_pos = trace.back();
-    //                    trace.clear();
-    //                    trace.push_back(current_pos);
-    //                    return true;
-    //                }
-    //                break;
-    //            }
-    //            case RED_STATE: {
-    //                break;
-    //            }
-    //            case GREEN_STATE: {
-    //                //ground!
-    //                for (auto begin : trace) {
-    //                
-    //                }
-    //                if (trace.size() > 1) {
-    //                    current_pos = trace.back();
-    //                    trace.clear();
-    //                    trace.push_back(current_pos);
-    //                    return true;
-    //                }
-    //                break;
-    //            }
-    //            case YELLOW_STATE: {
-    //                break;
-    //            }
+        int pointer_x = x, pointer_y = y;
+        Tile* tile = getTile(x, y);
+        STATE state = tile->getState();
+        switch (state) {
+            case WHITE_STATE:{
+                if (f->frame_type_ == BLUE_FRAME) {
+                    getTile(x, y)->setState(BLUE_TEMP_STATE);
+                } else if (f->frame_type_ == RED_FRAME) {
+                    getTile(x, y)->setState(RED_TEMP_STATE);
+                } else if (f->frame_type_ == YELLOW_FRAME) {
+                    getTile(x, y)->setState(YELLOW_TEMP_STATE);
+                } else if (f->frame_type_ == GREEN_FRAME) {
+                    getTile(x, y)->setState(GREEN_TEMP_STATE);
+                }
+                break;
+            }
+            case GREY_STATE: {
+                if (realming) {
+                    for (auto pos : tmp) {
+                        pos->first;
+                        pos->second;
+                    }
+                    //cal
+                }
+                break;
+            }
+            case BLUE_STATE: {
+                if (realming) {
+                    for (auto pos : tmp) {
+                        pos->first;
+                        pos->second;
+                    }
+                    //cal
+                }
+                break;
+            }
+            case RED_STATE: {
+                break;
+            }
+            case GREEN_STATE: {
+                break;
+            }
+            case YELLOW_STATE: {
+                break;
+            }
+            case BLUE_TEMP_STATE: {
+                break;
+            }
+            case RED_TEMP_STATE: {
+                break;
+            }
+            case GREEN_TEMP_STATE: {
+                break;
+            }
+            case YELLOW_TEMP_STATE: {
+                break;
+            }
+        }
 
-    //        }
 
-    //    }
-
-    //}
+    }
 
     //for (auto e : enemy) {
     //    e->x += e->dx;
@@ -146,12 +151,12 @@ void Map::drawMap(sf::RenderWindow* window) {
     for (size_t i = 0; i < coordinate_Map_.size(); ++i) {
         Tile* t = coordinate_Map_.at(i);
         std::pair<size_t, size_t> pos = getCoordinate(i, t->getWidth(), t->getheight());
-        if (t->getSprite() != nullptr) {
+        if (t->getTileSprite() != nullptr) {
             t->drawTile(window, pos.first , pos.second);
         }
     }
 
-    //for (auto s : ship) {
-    //    s->drawShip(window, tile_size_);
-    //}
+    for (auto f : frame) {
+        f->drawFrame(window);
+    }
 }

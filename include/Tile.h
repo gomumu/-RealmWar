@@ -34,12 +34,12 @@ public:
         this->state = state;
     }
 
-    void setSprite(sf::Sprite* sp) {
-        this->sp = sp;
+    void setTileSprite(sf::Sprite* sp) {
+        this->tile_sp = sp;
     }
 
-    sf::Sprite* getSprite() {
-        return sp;
+    sf::Sprite* getTileSprite() {
+        return tile_sp;
     }
 
     const size_t getWidth() const {
@@ -52,7 +52,7 @@ public:
 
 private:
     STATE state;
-    sf::Sprite* sp;
+    sf::Sprite* tile_sp;
     size_t width_;
     size_t height_;
 };
