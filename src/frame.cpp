@@ -6,7 +6,7 @@
 using namespace sf;
 
 Frame::Frame() {
-    current_pos = new position(0, 0);
+    current_pos = position(0, 0);
 }
 
 Frame* Frame::createFrame(FRAME_TYPE frame_t) {
@@ -40,29 +40,29 @@ Frame* Frame::createFrame(FRAME_TYPE frame_t) {
 }
 
 void Frame::up() {
-    int x = current_pos->first;
-    int y = current_pos->second - 1;
-    current_pos = new position(x, y);
+    int x = current_pos.first;
+    int y = current_pos.second - 1;
+    current_pos = position(x, y);
 }
 
 void Frame::down() {
-    int x = current_pos->first;
-    int y = current_pos->second + 1;
-    current_pos = new position(x, y);
+    int x = current_pos.first;
+    int y = current_pos.second + 1;
+    current_pos = position(x, y);
 }
 
 void Frame::left() {
-    int x = current_pos->first - 1;
-    int y = current_pos->second;
-    current_pos = new position(x, y);
+    int x = current_pos.first - 1;
+    int y = current_pos.second;
+    current_pos = position(x, y);
 }
 void Frame::right() {
-    int x = current_pos->first + 1;
-    int y = current_pos->second;
-    current_pos = new position(x, y);
+    int x = current_pos.first + 1;
+    int y = current_pos.second;
+    current_pos = position(x, y);
 }
 
 void Frame::drawFrame(sf::RenderWindow* window) {
-    sp->setPosition(current_pos->first*width_, (float)current_pos->second*height_);
+    sp->setPosition(current_pos.first*width_, (float)current_pos.second*height_);
     window->draw(*sp);
 }

@@ -38,22 +38,18 @@ public:
     virtual void down();
     virtual void left();
     virtual void right();
-    std::list<position*> getTmp() {
+    std::list<position> getTmp() {
         return tmp;
     }
 
-    bool undo() {
-        if (!tmp.empty()) {
-            tmp.pop_back();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    position* getCurrentPos() {
+    position getCurrentPos() {
         return current_pos;
     }
+
+    void setCurrentPos(position pos) {
+        current_pos = pos;
+    }
+
     void Frame::drawFrame(sf::RenderWindow* window);
     FRAME_TYPE frame_type_;
 
@@ -66,8 +62,8 @@ public:
     }
 
 protected:
-    std::list<position*> tmp;
-    position* current_pos;
+    std::list<position> tmp;
+    position current_pos;
     DIRECTION direction;
     sf::Sprite* sp;
     size_t width_;

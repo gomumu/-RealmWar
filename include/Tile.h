@@ -22,6 +22,8 @@ class Tile {
 public:
     static Tile* createTile(STATE state);
 
+    static void initTile();
+
     Tile();
 
     void drawTile(sf::RenderWindow* window, size_t pos_x, size_t pos_y);
@@ -30,17 +32,7 @@ public:
         return state;
     }
 
-    void setState(STATE state) {
-        this->state = state;
-    }
-
-    void setTileSprite(sf::Sprite* sp) {
-        this->tile_sp = sp;
-    }
-
-    sf::Sprite* getTileSprite() {
-        return tile_sp;
-    }
+    void setState(STATE state);
 
     const size_t getWidth() const {
         return width_;
@@ -52,8 +44,19 @@ public:
 
 private:
     STATE state;
-    sf::Sprite* tile_sp;
-    size_t width_;
-    size_t height_;
+
+    static sf::Sprite* WHITE;
+    static sf::Sprite* GREY;
+    static sf::Sprite* BLUE;
+    static sf::Sprite* BLUE_TEMP;
+    static sf::Sprite* RED;
+    static sf::Sprite* RED_TEMP;
+    static sf::Sprite* YELLOW;
+    static sf::Sprite* YELLOW_TEMP;
+    static sf::Sprite* GREEN;
+    static sf::Sprite* GREEN_TEMP;
+
+    static size_t width_;
+    static size_t height_;
 };
 #endif
