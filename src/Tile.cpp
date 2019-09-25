@@ -15,7 +15,7 @@ sf::Sprite* Tile::GREEN_TEMP = nullptr;
 size_t Tile::width_ = 0;
 size_t Tile::height_ = 0;
 
-Tile::Tile() : state(WHITE_STATE) {
+Tile::Tile() : state(WHITE_STATE), checked(false) {
 }
 
 Tile* Tile::createTile(STATE state) {

@@ -2,6 +2,7 @@
 #define _Map_
 
 #include <vector>
+#include <list>
 #include "Tile.h"
 
 class Frame;
@@ -30,7 +31,7 @@ public:
 
     std::pair<size_t, size_t> Map::getCoordinate(size_t idx, size_t tile_width, size_t tile_height);
 
-    void floodFill(STATE s, Tile* target_tile);
+    void floodFill(size_t x, size_t y);
 
     bool updateMap();
 

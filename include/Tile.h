@@ -42,8 +42,18 @@ public:
         return height_;
     }
 
+    bool isChecked() {
+        return checked;
+    }
+
+    void setChecked(bool checked) {
+        this->checked = checked;
+    }
+
 private:
     STATE state;
+
+    bool checked;
 
     static sf::Sprite* WHITE;
     static sf::Sprite* GREY;

@@ -3,6 +3,7 @@
 #include "frame.h"
 #include "enemy.h"
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 
 Map::Map(int max_x, int max_y) : max_x(max_x), max_y(max_y), white_tile_number_(0){
     init();
@@ -41,10 +42,14 @@ std::pair<size_t, size_t> Map::getMapSize() {
 
 
 Tile* Map::getTile(int x, int y) {
+    size_t idx = max_x * y + x;
+    if (idx < 0 || idx > coordinate_Map_.size()) return nullptr;
     return coordinate_Map_.at(max_x * y + x);
 }
 
 void Map::setTile(int x, int y, Tile* tile) {
+    size_t idx = max_x * y + x;
+    if (idx < 0 || idx > coordinate_Map_.size()) return;
     coordinate_Map_.at(max_x * y + x) = tile;
 }
 
@@ -92,13 +97,20 @@ std::pair<size_t, size_t> Map::getCoordinate(size_t idx, size_t tile_width, size
 //    13. Continue looping until Q is exhausted.
 //    14. Return.
 
-void Map::floodFill(STATE s, Tile* target_tile) {
-    if (target_tile) {
-    
+void Map::floodFill(size_t x, size_t y) {
+    Tile* target_tile = getTile(x, y);
+    if (target_tile && target_tile->getState() == WHITE_STATE && !target_tile->isChecked()) {
+        target_tile->setChecked(true);
+        floodFill(x - 1, y);
+        floodFill(x + 1, y);
+        floodFill(x, y - 1);
+        floodFill(x, y + 1);
     }
 }
 
 bool Map::updateMap() {
+
+    auto white_count = [](Tile* tile) -> bool {if (tile->getState() == WHITE_STATE) return true; };
 
     for (auto f : frame) {
         std::list<position> tmp = f->getTmp();
@@ -121,34 +133,65 @@ bool Map::updateMap() {
         Tile* tile = getTile(p.first, p.second);
         STATE state = tile->getState();
 
-        // floodFill ½ÃÀÛÁ¡
-        Tile* left_top = nullptr;
-        Tile* right_bottom = nullptr;
-
         switch (state) {
             case WHITE_STATE:{
                 if (f->frame_type_ == BLUE_FRAME) {
                     tile->setState(BLUE_TEMP_STATE);
                     setTile(p.first, p.second, tile);
-                    tmp.push_back(pos);
+                    f->pushTmp(pos);
                 } else if (f->frame_type_ == RED_FRAME) {
                     tile->setState(RED_TEMP_STATE);
                     setTile(p.first, p.second, tile);
-                    tmp.push_back(pos);
+                    f->pushTmp(pos);
                 } else if (f->frame_type_ == YELLOW_FRAME) {
                     tile->setState(YELLOW_TEMP_STATE);
                     setTile(p.first, p.second, tile);
-                    tmp.push_back(pos);
+                    f->pushTmp(pos);
                 } else if (f->frame_type_ == GREEN_FRAME) {
                     tile->setState(GREEN_TEMP_STATE);
                     setTile(p.first, p.second, tile);
-                    tmp.push_back(pos);
+                    f->pushTmp(pos);
                 }
                 break;
             }
             case GREY_STATE: {
-                for (auto t : coordinate_Map_) {
-                    
+                size_t total_white = count_if(coordinate_Map_.begin(), coordinate_Map_.end(), white_count);
+                if (tmp.size() != 0) {
+                    for (auto p : tmp) {
+                        if (getTile(p.first - 1, p.second)->getState() == WHITE_STATE) {
+                            floodFill(p.first - 1, p.second);
+                            break;
+                        }
+                        else if (getTile(p.first + 1, p.second)->getState() == WHITE_STATE) {
+                            floodFill(p.first + 1, p.second);
+                            break;
+                        }
+                        else if (getTile(p.first, p.second - 1)->getState() == WHITE_STATE) {
+                            floodFill(p.first, p.second - 1);
+                            break;
+                        }
+                        else if (getTile(p.first, p.second + 1)->getState() == WHITE_STATE) {
+                            floodFill(p.first, p.second + 1);
+                            break;
+                        }
+                    }
+                    auto white_count = [](Tile* tile) -> bool {if (tile->isChecked()) return true; };
+                    size_t flood_fill_size = count_if(coordinate_Map_.begin(), coordinate_Map_.end(), white_count);
+                    bool use_checked = flood_fill_size < total_white - flood_fill_size;
+                    for (auto tile : coordinate_Map_) {
+                        if (tile->getState() == WHITE_STATE) {
+                            if ((use_checked && tile->isChecked()) || (!use_checked && !tile->isChecked())) {
+                                tile->setState(BLUE_STATE);
+                            } else {
+                                tile->setChecked(false);
+                            }
+                        }
+                    }
+                    for (auto t : tmp) {
+                        Tile * tile = getTile(t.first, t.second);
+                        tile->setState(BLUE_STATE);
+                    }
+                    f->eraseAllTmp();
                 }
                 break;
             }

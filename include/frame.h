@@ -42,6 +42,15 @@ public:
         return tmp;
     }
 
+    void pushTmp(position pos) {
+        tmp.push_back(pos);
+    }
+
+    void eraseAllTmp() {
+        tmp.clear();
+    }
+
+
     position getCurrentPos() {
         return current_pos;
     }
