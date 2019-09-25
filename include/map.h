@@ -2,10 +2,10 @@
 #define _Map_
 
 #include <vector>
+#include "Tile.h"
 
 class Frame;
 class Enemy;
-class Tile;
 
 namespace sf{
 class RenderWindow;
@@ -29,8 +29,6 @@ public:
     }
 
     std::pair<size_t, size_t> Map::getCoordinate(size_t idx, size_t tile_width, size_t tile_height);
-
-    void inBoundPos(position& p);
 
     void floodFill(STATE s, Tile* target_tile);
 

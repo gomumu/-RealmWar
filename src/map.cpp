@@ -92,22 +92,6 @@ std::pair<size_t, size_t> Map::getCoordinate(size_t idx, size_t tile_width, size
 //    13. Continue looping until Q is exhausted.
 //    14. Return.
 
-void Map::inBoundPos(position& p) {
-    if (p.first < 0) {
-        p.first = 0;
-    }
-    else if (p.first > max_x - 1) {
-        p.first = max_x - 1;
-    }
-
-    if (p.second < 0) {
-        p.second = 0;
-    }
-    else if (p.second > max_y - 1) {
-        p.second = max_y - 1;
-    }
-}
-
 void Map::floodFill(STATE s, Tile* target_tile) {
     if (target_tile) {
     
@@ -119,7 +103,17 @@ bool Map::updateMap() {
     for (auto f : frame) {
         std::list<position> tmp = f->getTmp();
         position p = f->getCurrentPos();
-        inBoundPos(p);
+        if (p.first < 0) {
+            p.first = 0;
+        } else if (p.first > max_x - 1) {
+            p.first = max_x - 1;
+        }
+
+        if (p.second < 0) {
+            p.second = 0;
+        } else if (p.second > max_y - 1) {
+            p.second = max_y - 1;
+        }
 
         position pos = std::make_pair(p.first, p.second);
         f->setCurrentPos(pos);
@@ -131,20 +125,6 @@ bool Map::updateMap() {
         Tile* left_top = nullptr;
         Tile* right_bottom = nullptr;
 
-        auto get_flood_fill_start_pos = [&left_top, &right_bottom, this](position p) {
-            position left = p;
-            left.first -= 1;
-
-            position top = p;
-            top.second -= 1;
-
-            position right = p;
-            left.first += 1;
-
-            position bottom = p;
-            top.second += 1;
-
-        };
         switch (state) {
             case WHITE_STATE:{
                 if (f->frame_type_ == BLUE_FRAME) {
@@ -167,9 +147,8 @@ bool Map::updateMap() {
                 break;
             }
             case GREY_STATE: {
-                for (auto pos : tmp) {
-                
-                
+                for (auto t : coordinate_Map_) {
+                    
                 }
                 break;
             }
