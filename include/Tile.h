@@ -2,16 +2,16 @@
 #define _Tile_
 
 enum STATE {
-    WHITE_STATE = 0,
+    BLACK_STATE = 0,
     GREY_STATE,
-    BLUE_STATE,
-    BLUE_TEMP_STATE,
     RED_STATE,
     RED_TEMP_STATE,
-    GREEN_STATE,
-    GREEN_TEMP_STATE,
     YELLOW_STATE,
     YELLOW_TEMP_STATE,
+    GREEN_STATE,
+    GREEN_TEMP_STATE,
+    BLUE_STATE,
+    BLUE_TEMP_STATE
 };
 namespace sf {
     class RenderWindow;
@@ -34,14 +34,6 @@ public:
 
     void setState(STATE state);
 
-    const size_t getWidth() const {
-        return width_;
-    }
-
-    const size_t getheight() const {
-        return height_;
-    }
-
     bool isChecked() {
         return checked;
     }
@@ -50,23 +42,17 @@ public:
         this->checked = checked;
     }
 
+    static size_t getSize() {
+        return size_;
+    }
+
 private:
     STATE state;
 
     bool checked;
 
-    static sf::Sprite* WHITE;
-    static sf::Sprite* GREY;
-    static sf::Sprite* BLUE;
-    static sf::Sprite* BLUE_TEMP;
-    static sf::Sprite* RED;
-    static sf::Sprite* RED_TEMP;
-    static sf::Sprite* YELLOW;
-    static sf::Sprite* YELLOW_TEMP;
-    static sf::Sprite* GREEN;
-    static sf::Sprite* GREEN_TEMP;
+    static sf::Sprite* tile;
 
-    static size_t width_;
-    static size_t height_;
+    static size_t size_;
 };
 #endif

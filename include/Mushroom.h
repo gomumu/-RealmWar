@@ -1,5 +1,5 @@
-#ifndef _Frame_
-#define _Frame_
+#ifndef _Mushroom_
+#define _Mushroom_
 
 #include <list>
 
@@ -19,20 +19,21 @@ namespace sf {
     class RenderWindow;
 }
 
-enum FRAME_TYPE {
-    BLUE_FRAME,
-    RED_FRAME,
-    GREEN_FRAME,
-    YELLOW_FRAME,
+enum MUSHROOM_TYPE {
+    RED_MUSHROOM = 0,
+    BLUE_MUSHROOM,
+    GREEN_MUSHROOM,
+    YELLOW_MUSHROOM,
+    BLACK_MUSHROOM
 };
 
-class Frame {
+class Mushroom {
 
 public:
-    Frame();
-    ~Frame();
+    Mushroom();
+    ~Mushroom();
 
-    static Frame* createFrame(FRAME_TYPE frame);
+    static Mushroom* createMushroom(MUSHROOM_TYPE mushroom);
 
     virtual void up();
     virtual void down();
@@ -59,24 +60,19 @@ public:
         current_pos = pos;
     }
 
-    void Frame::drawFrame(sf::RenderWindow* window);
-    FRAME_TYPE frame_type_;
+    void Mushroom::drawMushroom(sf::RenderWindow* window);
+    MUSHROOM_TYPE mushroom_type_;
 
-    void setFrameSprite(sf::Sprite* sp) {
-        this->sp = sp;
-    }
-
-    sf::Sprite* getFrameSprite() {
-        return sp;
+    static size_t getSize() {
+        return size_;
     }
 
 protected:
     std::list<position> tmp;
     position current_pos;
     DIRECTION direction;
-    sf::Sprite* sp;
-    size_t width_;
-    size_t height_;
+    static size_t size_;
+    static sf::Sprite* sp;
 };
 
 

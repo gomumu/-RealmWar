@@ -5,7 +5,7 @@
 #include <list>
 #include "Tile.h"
 
-class Frame;
+class Mushroom;
 class Enemy;
 
 namespace sf{
@@ -45,7 +45,7 @@ public:
 
 
 
-    std::vector<Frame*> frame;
+    std::vector<Mushroom*> mushroom;
     std::vector<Enemy*> enemy;
 private:
     int max_x;

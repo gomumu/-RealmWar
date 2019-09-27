@@ -3,13 +3,21 @@
 
 #include <vector>
 
-typedef std::pair<int, int> position;
+namespace sf {
+    class Sprite;
+    class RenderWindow;
+}
 
 class Enemy {
 
 public:
-    Enemy(int x, int y);
+    Enemy();
     ~Enemy();
+
+    static Enemy* createEnemy(int x, int y, bool boss);
+
+    void move();
+
     int getx() {
         return x;
     }
@@ -22,24 +30,18 @@ public:
     int getdy() {
         return dy;
     }
+    size_t getSize() {
+        return size_;
+    }
+
+    void Enemy::drawEnemy(sf::RenderWindow* window);
+
     int x;
     int y;
     int dx;
     int dy;
-};
-
-class ZetEnemy : public Enemy {
-public:
-    ZetEnemy();
-    ~ZetEnemy();
-};
-
-class BattleEnemy : public Enemy {
-public:
-    BattleEnemy();
-    ~BattleEnemy();
-
-    std::vector<position*> misile;
+    sf::Sprite* sp;
+    size_t size_;
 };
 
 #endif

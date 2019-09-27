@@ -1,32 +1,32 @@
 #ifndef _Input_Handler_
 #define _Input_Handler_
 
-#include "frame.h"
+#include "Mushroom.h"
 
 class Command {
 public:
     virtual ~Command() {}
-    virtual void execute(Frame* frame) = 0;
+    virtual void execute(Mushroom* mushroom) = 0;
 };
 
 class UpCommand : public Command {
 public:
-    virtual void execute(Frame* frame);
+    virtual void execute(Mushroom* mushroom);
 };
 
 class DownCommand : public Command {
 public:
-    virtual void execute(Frame* frame);
+    virtual void execute(Mushroom* mushroom);
 };
 
 class LeftCommand : public Command {
 public:
-    virtual void execute(Frame* frame);
+    virtual void execute(Mushroom* mushroom);
 };
 
 class RightCommand : public Command {
 public:
-    virtual void execute(Frame* frame);
+    virtual void execute(Mushroom* mushroom);
 };
 
 class InputHandler {
@@ -43,7 +43,7 @@ public:
         delete button_left_;
         delete button_right_;
     }
-    void handleInput(Frame* obj);
+    void handleInput(Mushroom* obj);
 
 private:
 

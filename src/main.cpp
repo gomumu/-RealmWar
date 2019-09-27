@@ -4,11 +4,11 @@
 #include "InputHandler.h"
 #include "Map.h"
 #include "Enemy.h"
-#include "frame.h"
+#include "Mushroom.h"
 using namespace sf;
 
-const int map_y = 30;
-const int map_x = 50;
+const int map_y = 50;
+const int map_x = 100;
 
 //int grid[M][N] = {0};
 //
@@ -25,17 +25,19 @@ int main()
 {
     Map map(map_x, map_y);
     InputHandler handler;
-    Enemy* enemy1 = new Enemy(map_x, map_y);
-    Enemy* enemy2 = new Enemy(map_x, map_y);
-    Enemy* enemy3 = new Enemy(map_x, map_y);
-    Enemy* enemy4 = new Enemy(map_x, map_y);
-    Frame* frame = Frame::createFrame(BLUE_FRAME);
+    Enemy* enemy1 = Enemy::createEnemy(map_x, map_y, false);/*
+    Enemy* enemy2 = Enemy::createEnemy(map_x, map_y, false);
+    Enemy* enemy3 = Enemy::createEnemy(map_x, map_y, false);
+    Enemy* enemy4 = Enemy::createEnemy(map_x, map_y, false);
+    Enemy* enemy5 = Enemy::createEnemy(map_x, map_y, true);*/
+    Mushroom* mushroom = Mushroom::createMushroom(BLUE_MUSHROOM);
 
-    map.enemy.push_back(enemy1);
+    map.enemy.push_back(enemy1);/*
     map.enemy.push_back(enemy2);
     map.enemy.push_back(enemy3);
     map.enemy.push_back(enemy4);
-    map.frame.push_back(frame);
+    map.enemy.push_back(enemy5);*/
+    map.mushroom.push_back(mushroom);
 
     srand(time(0));
     std::pair<size_t, size_t> size =  map.getMapSize();
@@ -86,7 +88,7 @@ int main()
         
         if (timer > delay)
         {
-            handler.handleInput(frame);
+            handler.handleInput(mushroom);
             Game = map.updateMap();
             timer = 0;
 
