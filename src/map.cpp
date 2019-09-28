@@ -12,13 +12,15 @@ Map::Map(int max_x, int max_y) : max_x(max_x), max_y(max_y), white_tile_number_(
 
 Map::~Map() {
     coordinate_Map_.clear();
+    enemy.clear();
+    mushroom.clear();
 }
 
 void Map::init() {
     for (int i = 0; i < max_y; ++i) {
         for (int j = 0; j < max_x; ++j) {
             Tile* t = nullptr;
-            if (i < 2 || j < 2 || j > max_x - 2 || i > max_y - 3) {
+            if (i < 2 || j < 2 || j > max_x - 3 || i > max_y - 3) {
                 t = Tile::createTile(GREY_STATE);
             } else{
                 t = Tile::createTile(BLACK_STATE);
@@ -74,21 +76,21 @@ void Map::floodFill(size_t x, size_t y) {
 
 bool Map::updateMap() {
 
-    auto white_count = [](Tile* tile) -> bool {if (tile->getState() == BLACK_STATE) return true; };
+    std::vector<Enemy*> delete_enemy;
 
     for (auto m : mushroom) {
-        std::list<position> tmp = m->getTmp();
+        int ts = m->getTileSize();
         position p = m->getCurrentPos();
         if (p.first < 0) {
             p.first = 0;
-        } else if (p.first > max_x - 1) {
-            p.first = max_x - 1;
+        } else if (p.first > max_x - ts) {
+            p.first = max_x - ts;
         }
 
         if (p.second < 0) {
             p.second = 0;
-        } else if (p.second > max_y - 1) {
-            p.second = max_y - 1;
+        } else if (p.second > max_y - ts) {
+            p.second = max_y - ts;
         }
 
         position pos = std::make_pair(p.first, p.second);
@@ -97,11 +99,30 @@ bool Map::updateMap() {
         Tile* tile = getTile(p.first, p.second);
         STATE state = tile->getState();
 
+        std::list<position> tmp = m->getTmp();
         switch (state) {
             case BLACK_STATE:{
                 if (m->mushroom_type_ == BLUE_MUSHROOM) {
                     tile->setState(BLUE_TEMP_STATE);
                     setTile(p.first, p.second, tile);
+                    if (!tmp.empty()) {
+                        if (pos.first == tmp.back().first - 1, pos.second == tmp.back().second - 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(pos.first + 1, pos.second);
+                            m->pushTmp(correction_pos);
+                        }
+                        else if (pos.first == tmp.back().first - 1, pos.second == tmp.back().second + 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(pos.first + 1, pos.second);
+                            m->pushTmp(correction_pos);
+                        }
+                        else if (pos.first == tmp.back().first + 1, pos.second == tmp.back().second + 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(pos.first - 1, pos.second - 1);
+                            m->pushTmp(correction_pos);
+                        }
+                        else if (pos.first == tmp.back().first + 1, pos.second == tmp.back().second - 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(pos.first - 1, pos.second - 1);
+                            m->pushTmp(correction_pos);
+                        }
+                    }
                     m->pushTmp(pos);
                 } else if (m->mushroom_type_ == RED_MUSHROOM) {
                     tile->setState(RED_TEMP_STATE);
@@ -119,41 +140,36 @@ bool Map::updateMap() {
                 break;
             }
             case GREY_STATE: {
-                size_t total_white = count_if(coordinate_Map_.begin(), coordinate_Map_.end(), white_count);
                 if (tmp.size() != 0) {
-                    for (auto p : tmp) {
-                        if (getTile(p.first - 1, p.second)->getState() == BLACK_STATE) {
-                            floodFill(p.first - 1, p.second);
-                            break;
-                        }
-                        else if (getTile(p.first + 1, p.second)->getState() == BLACK_STATE) {
-                            floodFill(p.first + 1, p.second);
-                            break;
-                        }
-                        else if (getTile(p.first, p.second - 1)->getState() == BLACK_STATE) {
-                            floodFill(p.first, p.second - 1);
-                            break;
-                        }
-                        else if (getTile(p.first, p.second + 1)->getState() == BLACK_STATE) {
-                            floodFill(p.first, p.second + 1);
-                            break;
-                        }
-                    }
-                    auto white_count = [](Tile* tile) -> bool {if (tile->isChecked()) return true; };
-                    size_t flood_fill_size = count_if(coordinate_Map_.begin(), coordinate_Map_.end(), white_count);
-                    bool use_checked = flood_fill_size < total_white - flood_fill_size;
-                    for (auto tile : coordinate_Map_) {
-                        if (tile->getState() == BLACK_STATE) {
-                            if ((use_checked && tile->isChecked()) || (!use_checked && !tile->isChecked())) {
-                                tile->setState(BLUE_STATE);
-                            } else {
-                                tile->setChecked(false);
+                    for (auto e : enemy) {
+                        if (e->boss) {
+                            floodFill(e->x, e->y);
+                            for (auto tile : coordinate_Map_) {
+                                if (!tile->isChecked()) {
+                                    if (tile->getState() == BLUE_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                        tile->setState(BLUE_STATE);
+                                    } else if (tile->getState() == RED_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                        tile->setState(RED_STATE);
+                                    } else if (tile->getState() == YELLOW_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                        tile->setState(YELLOW_STATE);
+                                    } else if (tile->getState() == GREEN_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                        tile->setState(GREEN_STATE);
+                                    }
+                                } else {
+                                    tile->setChecked(false);
+                                }
                             }
+                            for (auto& e : enemy) {
+                                Tile* t = getTile(e->x, e->y);
+                                if (t->getState() == RED_STATE ||
+                                    t->getState() == BLUE_STATE ||
+                                    t->getState() == YELLOW_STATE ||
+                                    t->getState() == GREEN_STATE) {
+                                        delete_enemy.push_back(e);
+                                }
+                            }
+                            break;
                         }
-                    }
-                    for (auto t : tmp) {
-                        Tile * tile = getTile(t.first, t.second);
-                        tile->setState(BLUE_STATE);
                     }
                     m->eraseAllTmp();
                 }
@@ -161,44 +177,40 @@ bool Map::updateMap() {
             }
             case BLUE_STATE: {
                 if (m->mushroom_type_ == BLUE_MUSHROOM) {
-                    size_t total_white = count_if(coordinate_Map_.begin(), coordinate_Map_.end(), white_count);
                     if (tmp.size() != 0) {
-                        for (auto p : tmp) {
-                            if (getTile(p.first - 1, p.second)->getState() == BLACK_STATE) {
-                                floodFill(p.first - 1, p.second);
-                                break;
-                            }
-                            else if (getTile(p.first + 1, p.second)->getState() == BLACK_STATE) {
-                                floodFill(p.first + 1, p.second);
-                                break;
-                            }
-                            else if (getTile(p.first, p.second - 1)->getState() == BLACK_STATE) {
-                                floodFill(p.first, p.second - 1);
-                                break;
-                            }
-                            else if (getTile(p.first, p.second + 1)->getState() == BLACK_STATE) {
-                                floodFill(p.first, p.second + 1);
-                                break;
-                            }
-                        }
-                        auto white_count = [](Tile* tile) -> bool {if (tile->isChecked()) return true; };
-                        size_t flood_fill_size = count_if(coordinate_Map_.begin(), coordinate_Map_.end(), white_count);
-                        bool use_checked = flood_fill_size < total_white - flood_fill_size;
-                        for (auto tile : coordinate_Map_) {
-                            if (tile->getState() == BLACK_STATE) {
-                                if ((use_checked && tile->isChecked()) || (!use_checked && !tile->isChecked())) {
-                                    tile->setState(BLUE_STATE);
+                        for (auto e : enemy) {
+                            if (e->boss) {
+                                floodFill(e->x, e->y);
+                                for (auto tile : coordinate_Map_) {
+                                    if (!tile->isChecked()) {
+                                        if (tile->getState() == BLUE_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                            tile->setState(BLUE_STATE);
+                                        }
+                                        else if (tile->getState() == RED_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                            tile->setState(RED_STATE);
+                                        }
+                                        else if (tile->getState() == YELLOW_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                            tile->setState(YELLOW_STATE);
+                                        }
+                                        else if (tile->getState() == GREEN_TEMP_STATE || tile->getState() == BLACK_STATE) {
+                                            tile->setState(GREEN_STATE);
+                                        }
+                                    } else {
+                                        tile->setChecked(false);
+                                    }
                                 }
-                                else {
-                                    tile->setChecked(false);
+                                for (auto& e : enemy) {
+                                    Tile* t = getTile(e->x, e->y);
+                                    if (t->getState() == RED_STATE ||
+                                        t->getState() == BLUE_STATE ||
+                                        t->getState() == YELLOW_STATE ||
+                                        t->getState() == GREEN_STATE) {
+                                            delete_enemy.push_back(e);
+                                    }
                                 }
+                                break;
                             }
                         }
-                        for (auto t : tmp) {
-                            Tile * tile = getTile(t.first, t.second);
-                            tile->setState(BLUE_STATE);
-                        }
-                        m->eraseAllTmp();
                     }
                     break;
                 }
@@ -229,45 +241,7 @@ bool Map::updateMap() {
 
     }
 
-    std::vector<Enemy*> delete_enemy;
-
-    for (auto& e : enemy) {
-        Tile* t = getTile(e->x, e->y);
-        if (t->getState() == RED_STATE ||
-            t->getState() == BLUE_STATE ||
-            t->getState() == YELLOW_STATE ||
-            t->getState() == GREEN_STATE) {
-            delete_enemy.push_back(e);
-        }
-
-        e->x += e->dx;
-        if (e->x < 0) e->x = 0;
-        if (e->x > max_x) e->x = max_x;
-        e->y += e->dy;
-        if (e->y < 0) e->y = 0;
-        if (e->y > max_y) e->y = max_y;
-
-        t = getTile(e->x, e->y);
-        if (t->getState() == RED_TEMP_STATE ||
-            t->getState() == BLUE_TEMP_STATE ||
-            t->getState() == YELLOW_TEMP_STATE ||
-            t->getState() == GREEN_TEMP_STATE) {
-            return false;
-        }
-
-        if (t->getState() == GREY_STATE || t->getState() == RED_STATE ||
-            t->getState() == BLUE_STATE || t->getState() == YELLOW_STATE ||
-            t->getState() == GREEN_STATE) {
-            if (e->x < 2 || e->x > max_x - 2) {
-                e->dx = -(e->dx); e->x += e->dx;
-            }
-            if(e->y < 2 || e->y > max_y - 2){
-                e->dy = -e->dy; e->y += e->dy;
-            }
-        }
-    }
-
-    auto deleteEnemy = [this] (Enemy* e) {
+    auto deleteEnemy = [this](Enemy* e) {
         for (auto iter = enemy.begin(); iter != enemy.end(); ++iter) {
             if (*iter == e) {
                 enemy.erase(iter);
@@ -275,6 +249,32 @@ bool Map::updateMap() {
             }
         }};
     for_each(delete_enemy.begin(), delete_enemy.end(), deleteEnemy);
+
+    for (auto& e : enemy) {
+        Tile* t = getTile(e->x, e->y);
+        if (t->getState() == RED_TEMP_STATE ||
+            t->getState() == BLUE_TEMP_STATE ||
+            t->getState() == YELLOW_TEMP_STATE ||
+            t->getState() == GREEN_TEMP_STATE) {
+            return false;
+        }
+        if (t->getState() == BLACK_STATE) {
+            Tile* tmp_t = e->dx > 0 ? getTile(e->x + e->dx + e->getTileSize(), e->y) : getTile(e->x + e->dx, e->y);
+            if (tmp_t->getState() == GREY_STATE || tmp_t->getState() == RED_STATE ||
+                tmp_t->getState() == BLUE_STATE || tmp_t->getState() == YELLOW_STATE ||
+                tmp_t->getState() == GREEN_STATE) {
+                e->dx = -(e->dx);
+            }
+            tmp_t = e->dy > 0 ? getTile(e->x, e->y + e->dy + e->getTileSize()) : getTile(e->x, e->y + e->dy);
+            if (tmp_t->getState() == GREY_STATE || tmp_t->getState() == RED_STATE ||
+                tmp_t->getState() == BLUE_STATE || tmp_t->getState() == YELLOW_STATE ||
+                tmp_t->getState() == GREEN_STATE) {
+                e->dy = -(e->dy);
+            }
+            e->x += e->dx;
+            e->y += e->dy;
+        }
+    }
     return true;
 }
 

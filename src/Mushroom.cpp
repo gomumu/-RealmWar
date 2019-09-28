@@ -8,6 +8,7 @@ using namespace sf;
 
 sf::Sprite* Mushroom::sp = nullptr;
 size_t Mushroom::size_ = 0;
+size_t Mushroom::tile_size_ = 0;
 
 Mushroom::Mushroom() {
     current_pos = position(0, 0);
@@ -21,6 +22,7 @@ Mushroom* Mushroom::createMushroom(MUSHROOM_TYPE mushroom_t) {
     sp = new sf::Sprite(*texture);
     sf::Vector2u v = texture->getSize();
     mushroom->size_ = v.y;
+    mushroom->tile_size_ = v.y / Tile::getSize();
     return mushroom;
 }
 

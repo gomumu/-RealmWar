@@ -7,16 +7,18 @@
 
 using namespace sf;
 
-Enemy::Enemy() {
+Enemy::Enemy() : x(0), y(0), dx(0), dy(0) {
 }
 
 Enemy* Enemy::createEnemy(int x, int y, bool boss) {
     Enemy* enemy = new Enemy();
     enemy->x = x / 2;
     enemy->y = y / 2;
-    enemy->dx = 4 - rand() % 8;
-    enemy->dy = 4 - rand() % 8;
 
+    while (enemy->dx == 0 || enemy->dy == 0) {
+        enemy->dx = 2 - rand() % 4;
+        enemy->dy = 2 - rand() % 4;
+    }
     sf::Texture* texture = new sf::Texture();
     if (boss) {
         texture->loadFromFile("../images/enemy_boss.png");
@@ -25,7 +27,13 @@ Enemy* Enemy::createEnemy(int x, int y, bool boss) {
     }
     enemy->sp = new sf::Sprite(*texture);
     sf::Vector2u v = texture->getSize();
-    enemy->size_ = v.y;
+    if (boss) {
+        enemy->size_ = v.y;
+        enemy->tile_size_ = v.y / Tile::getSize();
+    } else {
+        enemy->size_ = v.x;
+        enemy->tile_size_ = v.x / Tile::getSize();
+    }
     return enemy;
 }
 

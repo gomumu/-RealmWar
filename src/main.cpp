@@ -10,173 +10,84 @@ using namespace sf;
 const int map_y = 50;
 const int map_x = 100;
 
-//int grid[M][N] = {0};
-//
-//void drop(int y,int x)
-//{
-//  if (grid[y][x]==0) grid[y][x]=-1;
-//  if (grid[y-1][x]==0) drop(y-1,x);
-//  if (grid[y+1][x]==0) drop(y+1,x);
-//  if (grid[y][x-1]==0) drop(y,x-1);
-//  if (grid[y][x+1]==0) drop(y,x+1);
-//}
-
-int main()
-{
-    Map map(map_x, map_y);
+int main() {
+    Map* map = new Map(map_x, map_y);
     InputHandler handler;
-    Enemy* enemy1 = Enemy::createEnemy(map_x, map_y, false);/*
-    Enemy* enemy2 = Enemy::createEnemy(map_x, map_y, false);
-    Enemy* enemy3 = Enemy::createEnemy(map_x, map_y, false);
-    Enemy* enemy4 = Enemy::createEnemy(map_x, map_y, false);
-    Enemy* enemy5 = Enemy::createEnemy(map_x, map_y, true);*/
+    Enemy* enemy1 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 1, false);
+    Enemy* enemy2 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 3, false);
+    Enemy* enemy3 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 3, false);
+    Enemy* enemy4 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 1, false);
+    Enemy* enemy5 = Enemy::createEnemy(map_x / 4 * 2, map_y / 4 * 2, true);
     Mushroom* mushroom = Mushroom::createMushroom(BLUE_MUSHROOM);
 
-    map.enemy.push_back(enemy1);/*
-    map.enemy.push_back(enemy2);
-    map.enemy.push_back(enemy3);
-    map.enemy.push_back(enemy4);
-    map.enemy.push_back(enemy5);*/
-    map.mushroom.push_back(mushroom);
+    map->enemy.push_back(enemy1);
+    map->enemy.push_back(enemy2);
+    map->enemy.push_back(enemy3);
+    map->enemy.push_back(enemy4);
+    map->enemy.push_back(enemy5);
+    map->mushroom.push_back(mushroom);
 
     srand(time(0));
-    std::pair<size_t, size_t> size =  map.getMapSize();
-	RenderWindow window(VideoMode(size.first, size.second), "");
-	window.setFramerateLimit(60);
+    std::pair<size_t, size_t> size =  map->getMapSize();
+    RenderWindow window(VideoMode(size.first, size.second), "");
+    window.setFramerateLimit(60);
 
-	//Texture t1,t2,t3;
-	//t1.loadFromFile(RESOURCE_PATH + "images/tiles.png");
- //   t2.loadFromFile(RESOURCE_PATH + "images/gameover.png");
- //   t3.loadFromFile(RESOURCE_PATH + "images/enemy.png");
 
-	//Sprite sTile(t1), sGameover(t2), sEnemy(t3);
-	//sGameover.setPosition(100,100);
-	//sEnemy.setOrigin(20,20);
-
-	//int enemyCount = 4;
-
-	bool Game=true;
-	//int x=0, y=0, dx=0, dy=0;
+    bool Game=true;
     float timer=0, delay=0.04; 
     Clock clock;
 
-    while (window.isOpen())
-    {
-		float time = clock.getElapsedTime().asSeconds();
-		clock.restart();
-		timer+=time;
+    Texture t;
+    t.loadFromFile("../images/gameover.png");
+    Sprite game_over(t);
+    game_over.setPosition(100, 100);
+    while (window.isOpen()) {
+        float time = clock.getElapsedTime().asSeconds();
+        clock.restart();
+        timer += time;
 
         Event e;
         while (window.pollEvent(e))
         {
             if (e.type == Event::Closed)
                 window.close();
-			   
-			if (e.type == Event::KeyPressed)
-             if (e.key.code==Keyboard::Escape)
-               {
-                for (int i=1;i< map_y -1;i++)
-	             for (int j=1;j< map_x -1;j++)
-                   //grid[i][j]=0;
+            if (e.type == Event::KeyPressed)
+                if (e.key.code == Keyboard::Escape) {
+                    Game = true;
+                    delete map;
+                    map = new Map(map_x, map_y);
+                    InputHandler handler;
+                    Enemy* enemy1 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 1, false);
+                    Enemy* enemy2 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 3, false);
+                    Enemy* enemy3 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 3, false);
+                    Enemy* enemy4 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 1, false);
+                    Enemy* enemy5 = Enemy::createEnemy(map_x / 4 * 2, map_y / 4 * 2, true);
+                    Mushroom* mushroom = Mushroom::createMushroom(BLUE_MUSHROOM);
 
-                //x=10;y=0;
-                Game=true;
-               }
-		}
+                    map->enemy.push_back(enemy1);
+                    map->enemy.push_back(enemy2);
+                    map->enemy.push_back(enemy3);
+                    map->enemy.push_back(enemy4);
+                    map->enemy.push_back(enemy5);
+                    map->mushroom.push_back(mushroom);
+                }
+        }
 
-		if (!Game) continue;
-        
+        if (!Game) {
+            window.draw(game_over);
+            continue;
+        }
+
         if (timer > delay)
         {
             handler.handleInput(mushroom);
-            Game = map.updateMap();
+            Game = map->updateMap();
             timer = 0;
 
-  //          int x_flag = 1;
-  //          if (dx < 0) x_flag = -1;
-  //          for (; dx != 0; x += x_flag, dx -= x_flag) {
-  //              if (x < 0) {
-  //                  x = 0;
-  //                  dx += x_flag;
-  //                  break;
-  //              }
-  //              if (x > N - 1) {
-  //                  x = N - 1;
-  //                  dx += x_flag;
-  //                  break;
-  //              }
-  //              if (grid[y][x] == 2) Game = false;
-  //              if (grid[y][x] == 0) grid[y][x] = 2;
-  //              timer = 0;
-  //          }
-
-  //          int y_flag = 1;
-  //          if (dy < 0) y_flag = -1;
-  //          for (; dy != 0; y += y_flag, dy -= y_flag) {
-  //              if (y < 0) {
-  //                  y = 0;
-  //                  dy += y_flag;
-  //                  break;
-  //              }
-  //              if (y > M - 1) {
-  //                  y = M - 1;
-  //                  dy += y_flag;
-  //                  break;
-  //              }
-  //              if (grid[y][x] == 2) Game = false;
-  //              if (grid[y][x] == 0) grid[y][x] = 2;
-  //              timer = 0;
-  //          }
-
-		//}
-
-		//for (int i=0;i<enemyCount;i++) a[i].move();
-
-		//if (grid[y][x]==1)
-  //        {
-  //         dx=dy=0;
-
-  //         for (int i=0;i<enemyCount;i++)
-  //              drop(a[i].y/ts, a[i].x/ts);
-
-  //         for (int i=0;i<M;i++)
-	 //	    for (int j=0;j<N;j++)
-  //            if (grid[i][j]==-1) grid[i][j]=0;
-  //            else grid[i][j]=1;
-  //        }
-
-  //      for (int i=0;i<enemyCount;i++)
-  //         if  (grid[a[i].y/ts][a[i].x/ts]==2) Game=false;
-
-  //    /////////draw//////////
-  //    window.clear();
-
-	 // for (int i=0;i<M;i++)
-		//for (int j=0;j<N;j++)
-		// {
-  //          if (grid[i][j]==0) continue;
-  //          if (grid[i][j]==1) sTile.setTextureRect(IntRect( 0,0,ts,ts));
-  //          if (grid[i][j]==2) sTile.setTextureRect(IntRect(54,0,ts,ts));
-		//	sTile.setPosition(j*ts,i*ts);
-		//	window.draw(sTile);
-		// }
-        window.clear();
-        map.drawMap(&window);
-  //    sTile.setTextureRect(IntRect(36,0,ts,ts));
-	 // sTile.setPosition(x*ts,y*ts);
-	 // window.draw(sTile);
-
-	  //sEnemy.rotate(10);
-   //   for (int i=0;i<enemyCount;i++)
-   //    {
-	  //  sEnemy.setPosition(a[i].x,a[i].y);
-	  //  window.draw(sEnemy);
+            window.clear();
+            map->drawMap(&window);
+            window.display();
         }
-
-      //if (!Game) window.draw(sGameover);
-
- 	  window.display();
-	}
-
+    }
     return 0;
 }

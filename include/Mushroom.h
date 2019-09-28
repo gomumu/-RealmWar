@@ -63,6 +63,10 @@ public:
     void Mushroom::drawMushroom(sf::RenderWindow* window);
     MUSHROOM_TYPE mushroom_type_;
 
+    static size_t getTileSize() {
+        return tile_size_;
+    }
+
     static size_t getSize() {
         return size_;
     }
@@ -72,6 +76,7 @@ protected:
     position current_pos;
     DIRECTION direction;
     static size_t size_;
+    static size_t tile_size_;
     static sf::Sprite* sp;
 };
 

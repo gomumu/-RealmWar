@@ -30,6 +30,11 @@ public:
     int getdy() {
         return dy;
     }
+
+    size_t getTileSize() {
+        return tile_size_;
+    }
+
     size_t getSize() {
         return size_;
     }
@@ -42,6 +47,8 @@ public:
     int dy;
     sf::Sprite* sp;
     size_t size_;
+    size_t tile_size_;
+    bool boss;
 };
 
 #endif
