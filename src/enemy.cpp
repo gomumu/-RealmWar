@@ -7,13 +7,14 @@
 
 using namespace sf;
 
-Enemy::Enemy() : x(0), y(0), dx(0), dy(0) {
+Enemy::Enemy() : x(0), y(0), dx(0), dy(0), boss(false) {
 }
 
 Enemy* Enemy::createEnemy(int x, int y, bool boss) {
     Enemy* enemy = new Enemy();
     enemy->x = x / 2;
     enemy->y = y / 2;
+    enemy->boss = true;
 
     while (enemy->dx == 0 || enemy->dy == 0) {
         enemy->dx = 2 - rand() % 4;

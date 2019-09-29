@@ -238,7 +238,6 @@ bool Map::updateMap() {
             }
         }
 
-
     }
 
     auto deleteEnemy = [this](Enemy* e) {
@@ -259,17 +258,30 @@ bool Map::updateMap() {
             return false;
         }
         if (t->getState() == BLACK_STATE) {
-            Tile* tmp_t = e->dx > 0 ? getTile(e->x + e->dx + e->getTileSize(), e->y) : getTile(e->x + e->dx, e->y);
+            int dx = e->dx > 0 ? e->x + e->dx + e->getTileSize() : e->x + e->dx;
+            Tile* tmp_t = getTile(dx, e->y);
             if (tmp_t->getState() == GREY_STATE || tmp_t->getState() == RED_STATE ||
                 tmp_t->getState() == BLUE_STATE || tmp_t->getState() == YELLOW_STATE ||
                 tmp_t->getState() == GREEN_STATE) {
                 e->dx = -(e->dx);
+                dx = e->dx > 0 ? e->x + e->dx + e->getTileSize() : e->x + e->dx;
             }
-            tmp_t = e->dy > 0 ? getTile(e->x, e->y + e->dy + e->getTileSize()) : getTile(e->x, e->y + e->dy);
+
+            int dy = e->dy > 0 ? e->y + e->dy + e->getTileSize() : e->y + e->dy;
+            tmp_t = getTile(e->x, dy);
             if (tmp_t->getState() == GREY_STATE || tmp_t->getState() == RED_STATE ||
                 tmp_t->getState() == BLUE_STATE || tmp_t->getState() == YELLOW_STATE ||
                 tmp_t->getState() == GREEN_STATE) {
                 e->dy = -(e->dy);
+                dy = e->dy > 0 ? e->y + e->dy + e->getTileSize() : e->y + e->dy;
+            }
+
+            tmp_t = getTile(dx, dy);
+            if (tmp_t->getState() == GREY_STATE || tmp_t->getState() == RED_STATE ||
+                tmp_t->getState() == BLUE_STATE || tmp_t->getState() == YELLOW_STATE ||
+                tmp_t->getState() == GREEN_STATE) {
+                e->dy = -(e->dy);
+                e->dx = -(e->dx);
             }
             e->x += e->dx;
             e->y += e->dy;
