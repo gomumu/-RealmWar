@@ -12,6 +12,7 @@ size_t Mushroom::tile_size_ = 0;
 
 Mushroom::Mushroom() {
     current_pos = position(0, 0);
+    direction = DIRECTION_NONE;
 }
 
 Mushroom* Mushroom::createMushroom(MUSHROOM_TYPE mushroom_t) {
@@ -27,26 +28,18 @@ Mushroom* Mushroom::createMushroom(MUSHROOM_TYPE mushroom_t) {
 }
 
 void Mushroom::up() {
-    int x = current_pos.first;
-    int y = current_pos.second - 1;
-    current_pos = position(x, y);
+    direction = DIRECTION_UP;
 }
 
 void Mushroom::down() {
-    int x = current_pos.first;
-    int y = current_pos.second + 1;
-    current_pos = position(x, y);
+    direction = DIRECTION_DOWN;
 }
 
 void Mushroom::left() {
-    int x = current_pos.first - 1;
-    int y = current_pos.second;
-    current_pos = position(x, y);
+    direction = DIRECTION_LEFT;
 }
 void Mushroom::right() {
-    int x = current_pos.first + 1;
-    int y = current_pos.second;
-    current_pos = position(x, y);
+    direction = DIRECTION_RIGHT;
 }
 
 void Mushroom::drawMushroom(sf::RenderWindow* window) {

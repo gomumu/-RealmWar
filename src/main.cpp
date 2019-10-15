@@ -40,7 +40,7 @@ int main() {
     Texture t;
     t.loadFromFile("../images/gameover.png");
     Sprite game_over(t);
-    game_over.setPosition(100, 100);
+    game_over.setPosition(650, 350);
     while (window.isOpen()) {
         float time = clock.getElapsedTime().asSeconds();
         clock.restart();
@@ -57,12 +57,12 @@ int main() {
                     delete map;
                     map = new Map(map_x, map_y);
                     InputHandler handler;
-                    Enemy* enemy1 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 1, false);
-                    Enemy* enemy2 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 3, false);
-                    Enemy* enemy3 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 3, false);
-                    Enemy* enemy4 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 1, false);
-                    Enemy* enemy5 = Enemy::createEnemy(map_x / 4 * 2, map_y / 4 * 2, true);
-                    Mushroom* mushroom = Mushroom::createMushroom(BLUE_MUSHROOM);
+                    enemy1 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 1, false);
+                    enemy2 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 3, false);
+                    enemy3 = Enemy::createEnemy(map_x / 4 * 1, map_y / 4 * 3, false);
+                    enemy4 = Enemy::createEnemy(map_x / 4 * 3, map_y / 4 * 1, false);
+                    enemy5 = Enemy::createEnemy(map_x / 4 * 2, map_y / 4 * 2, true);
+                    mushroom = Mushroom::createMushroom(BLUE_MUSHROOM);
 
                     map->enemy.push_back(enemy1);
                     map->enemy.push_back(enemy2);
@@ -73,20 +73,20 @@ int main() {
                 }
         }
 
-        if (!Game) {
-            window.draw(game_over);
-            continue;
-        }
-
-        if (timer > delay)
-        {
-            handler.handleInput(mushroom);
-            Game = map->updateMap();
-            timer = 0;
-
-            window.clear();
-            map->drawMap(&window);
-            window.display();
+        if (timer > delay) {
+            if (!Game) {
+                timer = 0;
+                window.clear();
+                window.draw(game_over);
+                window.display();
+            } else {
+                handler.handleInput(mushroom);
+                Game = map->updateMap();
+                timer = 0;
+                window.clear();
+                map->drawMap(&window);
+                window.display();
+            }
         }
     }
     return 0;

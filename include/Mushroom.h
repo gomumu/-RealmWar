@@ -4,6 +4,10 @@
 #include <list>
 
 typedef std::pair<int,int> position;
+namespace sf {
+    class Sprite;
+    class RenderWindow;
+}
 
 enum DIRECTION {
     DIRECTION_LEFT,
@@ -12,12 +16,6 @@ enum DIRECTION {
     DIRECTION_DOWN,
     DIRECTION_NONE
 };
-
-
-namespace sf {
-    class Sprite;
-    class RenderWindow;
-}
 
 enum MUSHROOM_TYPE {
     RED_MUSHROOM = 0,
@@ -58,6 +56,14 @@ public:
 
     void setCurrentPos(position pos) {
         current_pos = pos;
+    }
+
+    DIRECTION getDirection() {
+        return direction;
+    }
+
+    void setDirection(DIRECTION direction) {
+        this->direction = direction;
     }
 
     void Mushroom::drawMushroom(sf::RenderWindow* window);

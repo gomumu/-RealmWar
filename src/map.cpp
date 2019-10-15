@@ -29,6 +29,8 @@ void Map::init() {
             coordinate_Map_.push_back(t);
         }
     }
+    mushroom.clear();
+    enemy.clear();
 }
 
 std::pair<size_t, size_t> Map::getMapSize() {
@@ -75,28 +77,42 @@ void Map::floodFill(size_t x, size_t y) {
 
 
 bool Map::updateMap() {
-
     std::vector<Enemy*> delete_enemy;
-
     for (auto m : mushroom) {
         int ts = m->getTileSize();
-        position p = m->getCurrentPos();
-        if (p.first < 0) {
-            p.first = 0;
-        } else if (p.first > max_x - ts) {
-            p.first = max_x - ts;
+        DIRECTION direction = m->getDirection();
+        position current_pos = m->getCurrentPos();
+        if (direction == DIRECTION_LEFT) {
+            if (current_pos.first - 1 < 0) {
+                m->setDirection(DIRECTION_NONE);
+            } else {
+                current_pos.first = current_pos.first - 1;
+                m->setCurrentPos(current_pos);
+            }
+        } else if (direction == DIRECTION_RIGHT) {
+            if (current_pos.first + 1 > max_x - ts) {
+                m->setDirection(DIRECTION_NONE);
+            } else {
+                current_pos.first = current_pos.first + 1;
+                m->setCurrentPos(current_pos);
+            }
+        } else if(direction == DIRECTION_UP) {
+            if (current_pos.second - 1 < 0) {
+                m->setDirection(DIRECTION_NONE);
+            } else {
+                current_pos.second = current_pos.second - 1;
+                m->setCurrentPos(current_pos);
+            }
+        } else if(direction == DIRECTION_DOWN) {
+            if (current_pos.second + 1 > max_y - ts) {
+                m->setDirection(DIRECTION_NONE);
+            } else {
+                current_pos.second = current_pos.second + 1;
+                m->setCurrentPos(current_pos);
+            }
         }
 
-        if (p.second < 0) {
-            p.second = 0;
-        } else if (p.second > max_y - ts) {
-            p.second = max_y - ts;
-        }
-
-        position pos = std::make_pair(p.first, p.second);
-        m->setCurrentPos(pos);
-
-        Tile* tile = getTile(p.first, p.second);
+        Tile* tile = getTile(current_pos.first, current_pos.second);
         STATE state = tile->getState();
 
         std::list<position> tmp = m->getTmp();
@@ -104,38 +120,38 @@ bool Map::updateMap() {
             case BLACK_STATE:{
                 if (m->mushroom_type_ == BLUE_MUSHROOM) {
                     tile->setState(BLUE_TEMP_STATE);
-                    setTile(p.first, p.second, tile);
+                    setTile(current_pos.first, current_pos.second, tile);
                     if (!tmp.empty()) {
-                        if (pos.first == tmp.back().first - 1, pos.second == tmp.back().second - 1) {
-                            std::pair<int, int> correction_pos = std::make_pair(pos.first + 1, pos.second);
+                        if (current_pos.first == tmp.back().first - 1, current_pos.second == tmp.back().second - 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(current_pos.first + 1, current_pos.second);
                             m->pushTmp(correction_pos);
                         }
-                        else if (pos.first == tmp.back().first - 1, pos.second == tmp.back().second + 1) {
-                            std::pair<int, int> correction_pos = std::make_pair(pos.first + 1, pos.second);
+                        else if (current_pos.first == tmp.back().first - 1, current_pos.second == tmp.back().second + 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(current_pos.first + 1, current_pos.second);
                             m->pushTmp(correction_pos);
                         }
-                        else if (pos.first == tmp.back().first + 1, pos.second == tmp.back().second + 1) {
-                            std::pair<int, int> correction_pos = std::make_pair(pos.first - 1, pos.second - 1);
+                        else if (current_pos.first == tmp.back().first + 1, current_pos.second == tmp.back().second + 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(current_pos.first - 1, current_pos.second - 1);
                             m->pushTmp(correction_pos);
                         }
-                        else if (pos.first == tmp.back().first + 1, pos.second == tmp.back().second - 1) {
-                            std::pair<int, int> correction_pos = std::make_pair(pos.first - 1, pos.second - 1);
+                        else if (current_pos.first == tmp.back().first + 1, current_pos.second == tmp.back().second - 1) {
+                            std::pair<int, int> correction_pos = std::make_pair(current_pos.first - 1, current_pos.second - 1);
                             m->pushTmp(correction_pos);
                         }
                     }
-                    m->pushTmp(pos);
+                    m->pushTmp(current_pos);
                 } else if (m->mushroom_type_ == RED_MUSHROOM) {
                     tile->setState(RED_TEMP_STATE);
-                    setTile(p.first, p.second, tile);
-                    m->pushTmp(pos);
+                    setTile(current_pos.first, current_pos.second, tile);
+                    m->pushTmp(current_pos);
                 } else if (m->mushroom_type_ == YELLOW_MUSHROOM) {
                     tile->setState(YELLOW_TEMP_STATE);
-                    setTile(p.first, p.second, tile);
-                    m->pushTmp(pos);
+                    setTile(current_pos.first, current_pos.second, tile);
+                    m->pushTmp(current_pos);
                 } else if (m->mushroom_type_ == GREEN_MUSHROOM) {
                     tile->setState(GREEN_TEMP_STATE);
-                    setTile(p.first, p.second, tile);
-                    m->pushTmp(pos);
+                    setTile(current_pos.first, current_pos.second, tile);
+                    m->pushTmp(current_pos);
                 }
                 break;
             }
@@ -173,6 +189,7 @@ bool Map::updateMap() {
                     }
                     m->eraseAllTmp();
                 }
+                m->setDirection(DIRECTION_NONE);
                 break;
             }
             case BLUE_STATE: {
@@ -212,6 +229,7 @@ bool Map::updateMap() {
                             }
                         }
                     }
+                    m->setDirection(DIRECTION_NONE);
                     break;
                 }
             }
@@ -250,13 +268,19 @@ bool Map::updateMap() {
     for_each(delete_enemy.begin(), delete_enemy.end(), deleteEnemy);
 
     for (auto& e : enemy) {
-        Tile* t = getTile(e->x, e->y);
-        if (t->getState() == RED_TEMP_STATE ||
-            t->getState() == BLUE_TEMP_STATE ||
-            t->getState() == YELLOW_TEMP_STATE ||
-            t->getState() == GREEN_TEMP_STATE) {
-            return false;
+        for (int i = 0; i < e->getTileSize(); ++i) {
+            for (int j = 0; j < e->getTileSize(); ++j) {
+                Tile* t = getTile(e->x, e->y);
+                if (t->getState() == RED_TEMP_STATE ||
+                    t->getState() == BLUE_TEMP_STATE ||
+                    t->getState() == YELLOW_TEMP_STATE ||
+                    t->getState() == GREEN_TEMP_STATE) {
+                    return false;
+                }
+            }
         }
+
+        Tile* t = getTile(e->x, e->y);
         if (t->getState() == BLACK_STATE) {
             int dx = e->dx > 0 ? e->x + e->dx + e->getTileSize() : e->x + e->dx;
             Tile* tmp_t = getTile(dx, e->y);
